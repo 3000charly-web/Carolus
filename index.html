@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#e8f0e9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CAROLUS">
+<title>CAROLUS</title>
+<style>
+:root{--bg:#e8f0e9;--card:#fff;--text:#1e2822;--muted:#6d786f;--line:#d3ddd5;--alive:#eef8f0;--dead:#e4e8e5;--unknown:#f4f0e7}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Arial,sans-serif}
+button,input{font:inherit;color:inherit}.app{overflow:hidden}.pager{display:flex;width:300%;transform:translateX(-33.333%);transition:.22s}.screen{width:33.333%;flex:0 0 33.333%;min-height:100vh;padding:10px}
+.top{display:grid;grid-template-columns:42px 1fr auto;align-items:center;gap:6px;margin-bottom:10px}.brand{text-align:center}.brand h1{margin:0;font-size:24px;letter-spacing:.16em}.brand p{margin:2px 0 0;font-size:11px;color:var(--muted)}
+.icon,.arrow{width:40px;height:40px;border:1px solid var(--line);border-radius:12px;background:var(--card)}.icons{display:flex;gap:4px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px;margin-bottom:11px}.head{display:flex;justify-content:space-between;align-items:center}.head h2{margin:0;font-size:19px}.meta{font-size:11px;color:var(--muted)}
+.row{display:grid;gap:7px}.one{grid-template-columns:minmax(0,210px);justify-content:center}.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.person{position:relative;border:1px solid var(--line);border-radius:13px;padding:9px 34px 9px 9px;min-height:60px}.alive{background:var(--alive)}.dead{background:var(--dead)}.unknown{background:var(--unknown)}
+.person-main{width:100%;border:0;background:transparent;text-align:left;padding:0}.person b{display:block;font-size:12px;line-height:1.2}.person small{font-size:10px;color:var(--muted)}
+.info{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:28px;height:28px;border:1px solid var(--line);border-radius:50%;background:#fff}
+.heart{color:#d43d48}.dagger{color:#555}.ellipsis{color:#81796e}
+.conn{height:24px;position:relative}.conn:before{content:"";position:absolute;left:50%;top:0;width:2px;height:10px;background:var(--line)}.conn:after{content:"";position:absolute;left:25%;right:25%;top:10px;height:2px;background:var(--line)}
+.conn i{position:absolute;top:10px;width:2px;height:14px;background:var(--line)}.conn .l{left:25%}.conn .r{right:25%}.gps{display:grid;grid-template-columns:1fr 1fr;gap:7px}.grp{display:grid;gap:5px}
+.search{border:1px solid var(--line);border-radius:14px;padding:0 10px}.search input{width:100%;border:0;background:transparent;outline:0;padding:12px 0;font-size:16px}
+.tile{width:100%;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px;text-align:left;margin-top:7px}.setting{border:1px solid var(--line);border-radius:13px;padding:11px;margin-top:7px}
+.path{display:flex;gap:5px;overflow:auto;padding:8px 0}.path button{white-space:nowrap;border:1px solid var(--line);border-radius:20px;background:var(--card);padding:5px 8px;font-size:10px}
+.modal{display:none;position:fixed;inset:0;background:#0006;z-index:10;padding:18px;align-items:flex-end}.modal.show{display:flex}.sheet{width:100%;background:var(--card);border-radius:20px;padding:16px}.sheet h3{margin:0}.close{float:right}
+</style>
+</head>
+<body>
+<div class="app"><div class="pager" id="pager">
+<section class="screen">
+<div class="top"><button class="arrow" data-go="1">›</button><div class="brand"><h1>OSOBY</h1><p>wyszukiwanie i funkcje</p></div><span></span></div>
+<div class="card"><b>Szukaj osoby</b><div class="search"><input id="q" placeholder="Imię lub nazwisko…"></div><div id="results"></div></div>
+<div class="card"><b>Funkcje drzewa</b><button class="tile">Przodkowie w linii męskiej</button><button class="tile">Powiązanie ze mną</button><button class="tile">Wszystkie osoby</button></div>
+</section>
+
+<section class="screen">
+<div class="top"><button class="arrow" data-go="0">‹</button><div class="brand"><h1>CAROLUS</h1><p>Twoje drzewo genealogiczne</p></div><div class="icons"><button class="icon" id="search">⌕</button><button class="icon" id="theme">☾</button><button class="icon" data-go="2">⚙</button></div></div>
+<div class="card"><div class="head"><div><h2>Rodzina Karola</h2><div class="meta" id="focusMeta"></div></div><div>›</div></div><div class="path" id="path"></div><div id="tree"></div></div>
+<div class="meta" style="text-align:center">♥ żyje &nbsp; † zmarł/a &nbsp; … status nieznany</div>
+</section>
+
+<section class="screen">
+<div class="top"><span></span><div class="brand"><h1>USTAWIENIA</h1><p>CAROLUS</p></div><button class="arrow" data-go="1">‹</button></div>
+<div class="card"><div class="setting"><b>Osoba główna</b><div class="meta">Karol Kotyla</div></div><div class="setting"><b>Tryb ekranu</b><div class="meta">jasny / ciemny</div></div><div class="setting"><b>Import / eksport</b><div class="meta">całe drzewo w jednym pliku</div></div></div>
+</section>
+</div></div>
+
+<div class="modal" id="modal"><div class="sheet"><button class="close" id="close">×</button><h3 id="mn"></h3><div id="mb"></div></div></div>
+
+<script>
+const P={
+karol:["Karol Kotyla","ja","alive",["roman","lidia"]],
+roman:["Roman Kotyla","tata","dead",["henryk","halina"]],
+lidia:["Lidia Kotyla (Pacak)","mama","alive",["waclaw","marta"]],
+henryk:["Henryk Kotyla","dziadek","dead",["fr","anna"]],
+halina:["Halina Kotyla (Kruszyńska)","babcia","dead",["walenty","maria"]],
+waclaw:["Wacław Pacak","dziadek","dead",["piotr","katarzyna"]],
+marta:["Marta Pacak (Konieczna)","babcia","dead",["ignacy","jadwiga"]],
+fr:["Franciszek Kotyla","pradziadek","dead",["fr2","marianna"]],
+anna:["Anna Kotyla (Mistygacz)","prababcia","dead",[]],
+walenty:["Walenty Kruszyński","pradziadek","dead",[]],
+maria:["Maria Kowalska","prababcia","dead",[]],
+piotr:["Piotr Pacak","pradziadek","dead",[]],katarzyna:["Katarzyna Pacak (Psiuch)","prababcia","dead",[]],
+ignacy:["Ignacy Konieczny","pradziadek","dead",[]],jadwiga:["Jadwiga Konieczna (Janik)","prababcia","dead",[]],
+fr2:["Franciszek Kotyla","prapradziadek","dead",["lukasz","aniela"]],
+marianna:["Marianna Kotyla (Kamyk)","praprababcia","dead",[]],
+lukasz:["Łukasz Kotyla","praprapradziadek","dead",[]],
+aniela:["Aniela Kotyla (Górecka)","prapraprababcia","dead",[]]
+};
+let focus="karol",history=["karol"],screen=1;const pager=document.getElementById("pager"),tree=document.getElementById("tree"),modal=document.getElementById("modal");
+function go(n){screen=Math.max(0,Math.min(2,n));pager.style.transform=`translateX(-${screen*33.333}%)`}
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>go(+b.dataset.go));document.getElementById("search").onclick=()=>go(0);
+function sym(s){return s==="alive"?'<span class="heart">♥</span>':s==="dead"?'<span class="dagger">†</span>':'<span class="ellipsis">…</span>'}
+function card(id){let p=P[id];return `<div class="person ${p[2]}"><button class="person-main" data-id="${id}"><b>${p[0]} ${sym(p[2])}</b><small>${p[1]}</small></button><button class="info" data-info="${id}">ⓘ</button></div>`}
+function conn(){return '<div class="conn"><i class="l"></i><i class="r"></i></div>'}
+function render(){let p=P[focus];document.getElementById("focusMeta").textContent=p[0]+" • "+p[1];let h=`<div class="row one">${card(focus)}</div>`;if(p[3].length===2){h+=conn()+`<div class="row two">${p[3].map(card).join("")}</div>`;let gs=p[3].map(x=>P[x][3]);if(gs.some(x=>x.length)){h+=conn()+'<div class="gps">';gs.forEach(g=>h+='<div class="grp">'+(g.length?g.map(card).join(""):'<div class="person unknown"><b>Brak danych …</b></div>')+'</div>');h+='</div>'}}tree.innerHTML=h;document.getElementById("path").innerHTML=history.slice(-5).map(id=>`<button data-path="${id}">${P[id][0].split(" ")[0]}</button>`).join("");document.querySelectorAll(".person-main").forEach(b=>b.onclick=()=>{let id=b.dataset.id;if(id!==focus){focus=id;history.push(id);render();window.scrollTo({top:0,behavior:"smooth"})}});document.querySelectorAll("[data-info]").forEach(b=>b.onclick=e=>{e.stopPropagation();let p=P[b.dataset.info];document.getElementById("mn").textContent=p[0];document.getElementById("mb").innerHTML=`<p>${p[1]}</p><p>${p[2]==="alive"?"osoba żyjąca":"osoba zmarła"}</p>`;modal.classList.add("show")});document.querySelectorAll("[data-path]").forEach(b=>b.onclick=()=>{focus=b.dataset.path;history=history.slice(0,history.lastIndexOf(focus)+1);render()})}
+document.getElementById("close").onclick=()=>modal.classList.remove("show");modal.onclick=e=>{if(e.target===modal)modal.classList.remove("show")};
+document.getElementById("q").oninput=e=>{let q=e.target.value.toLowerCase(),r=document.getElementById("results");r.innerHTML=q?Object.entries(P).filter(([i,p])=>p[0].toLowerCase().includes(q)).slice(0,8).map(([id,p])=>`<button class="tile res" data-id="${id}">${p[0]}<br><span class="meta">${p[1]}</span></button>`).join(""):"";document.querySelectorAll(".res").forEach(b=>b.onclick=()=>{focus=b.dataset.id;history=["karol",focus];go(1);render()})};
+let sx=0,sy=0;document.addEventListener("touchstart",e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});document.addEventListener("touchend",e=>{let dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.2)dx<0?go(screen+1):go(screen-1)},{passive:true});
+render();go(1);
+</script></body></html>
